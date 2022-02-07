@@ -119,21 +119,11 @@ void TaskBlink(void *pvParameters)  // This is a task.
   Serial.println(xPortGetCoreID());
   while ( setupWait ) {
     delay(100);
-    rtc_wdt_feed();
-    //vTaskDelay(200);
-    //vTaskDelay(100/ portTICK_PERIOD_MS);
-    /*
-       void delay(uint32_t ms)
-      {
-      vTaskDelay(ms / portTICK_PERIOD_MS);
-      }
-    */
     ledState++;
     if ( ledState % 2 )
       digitalWrite(LED_PIN, HIGH);   // turn the LED on (HIGH is the voltage level)
     else
       digitalWrite(LED_PIN, LOW);    // turn the LED off by making the voltage LOW
-
   }
   for (;;) // A Task shall never return or exit.
   {
@@ -145,7 +135,6 @@ void TaskBlink(void *pvParameters)  // This is a task.
         digitalWrite(LED_PIN, HIGH);   // turn the LED on (HIGH is the voltage level)
       else
         digitalWrite(LED_PIN, LOW);    // turn the LED off by making the voltage LOW
-      //vTaskDelay(1);
       delay(1);
     }
     if ( Serial.available() ) {
@@ -163,14 +152,10 @@ void TaskBlink(void *pvParameters)  // This is a task.
 void loopCounts(void *pvParameters)  // This is a task.
 {
   (void) pvParameters;
-  rtc_wdt_protect_off(); // https://stackoverflow.com/questions/51750377/how-to-disable-interrupt-watchdog-in-esp32-or-increase-isr-time-limit
-  rtc_wdt_disable();
   Serial.print("loopCounts() [A] is running on core ");
   Serial.println(xPortGetCoreID());
   while ( setupWait ) {
     delay(100);
-    rtc_wdt_feed();
-    // vTaskDelay(100);
   }
   for (;;)
   {
@@ -192,9 +177,7 @@ void loopCounts(void *pvParameters)  // This is a task.
       lCntA = 0;
       lCntB = 0;
       lCntL = 0;
-      //esp_task_wdt_reset();
       delay(2);
-      // vTaskDelay(1);
     }
   }
 }
@@ -628,3 +611,12 @@ void testanimate(const uint8_t *bitmap, uint8_t w, uint8_t h) {
     }
   }
 }
+
+/*
+    rtc_wdt_protect_off(); // https://stackoverflow.com/questions/51750377/how-to-disable-interrupt-watchdog-in-esp32-or-increase-isr-time-limit
+    rtc_wdt_disable();
+    rtc_wdt_feed();
+    // vTaskDelay(100);
+    //esp_task_wdt_reset();
+
+*/
