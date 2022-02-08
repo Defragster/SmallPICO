@@ -79,16 +79,11 @@ void setup() {
 
 #ifdef BOARD_HAS_PSRAM
   delay(100);
-  rtc_wdt_feed();
   Serial.println("BOARD_HAS_PSRAM");
   Serial.printf("Total heap: %d\n", ESP.getHeapSize());
   Serial.printf("Free heap: %d\n", ESP.getFreeHeap());
-  delay(100);
-  rtc_wdt_feed();
-  //Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
-  delay(100);
-  rtc_wdt_feed();
-  //Serial.printf("Free PSRAM: %d\n", ESP.getFreePsram());
+  Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
+  Serial.printf("Free PSRAM: %d\n", ESP.getFreePsram());
   delay(100);
   logMemory();
 #endif
