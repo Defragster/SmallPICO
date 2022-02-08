@@ -47,6 +47,14 @@ void setup() {
 #else
   Serial.println("LittlePICO!");
 #endif
+  if ( psramFound() )
+    Serial.print(" TRUE :: psramFound()\n");
+  else
+#ifdef BOARD_HAS_PSRAM
+    Serial.print(" FALSE :: psramFound()\t Was compiled BOARD_HAS_PSRAM\n");
+#else
+    Serial.print(" FALSE :: psramFound()\t was NO compiled BOARD_HAS_PSRAM\n");
+#endif
   delay(100);
 
   // Now set up two tasks to run independently.
