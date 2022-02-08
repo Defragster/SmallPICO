@@ -1,11 +1,6 @@
 #include <rom/rtc.h>
 #include "soc/rtc_wdt.h"
 
-#if CONFIG_FREERTOS_UNICORE
-#define ARDUINO_RUNNING_CORE 0
-#else
-#define ARDUINO_RUNNING_CORE 1
-#endif
 #define ARDUINO_PRO_CORE 0
 #define ARDUINO_USR_CORE 1
 #ifdef LED_BUILTIN
