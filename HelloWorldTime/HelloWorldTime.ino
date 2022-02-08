@@ -22,6 +22,18 @@ void setup()
   delay(1000);
   digitalWrite(LED_PICO, LOW);   // turn the LED on (HIGH is the voltage level)
   Serial.println("\n" __FILE__ " " __DATE__ " " __TIME__);
+
+  Serial.printf("ESP32 Chip model = %s Rev %d\n", ESP.getChipModel(), ESP.getChipRevision());
+  Serial.printf("This chip has %d cores\n", ESP.getChipCores());  uint64_t chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).
+  uint16_t chip = (uint16_t)(chipid >> 32);
+  char ssid[23];
+  snprintf(ssid, 23, "ESP_ID:%04X%08X", chip, (uint32_t)chipid);
+  Serial.println( ssid );
+  uint64_t macAddress = ESP.getEfuseMac();
+  uint64_t macAddressTrunc = macAddress << 40;
+  uint64_t chipID = macAddressTrunc >> 40;
+  Serial.printf( "ESP MAC:0x%lx\n", chipid );
+
 #ifdef BOARD_HAS_PSRAM
   Serial.println("BOARD_HAS_PSRAM");
   Serial.printf("Total heap: %d\n", ESP.getHeapSize());
