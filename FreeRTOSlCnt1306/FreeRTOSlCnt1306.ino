@@ -9,10 +9,15 @@
 
 
 #ifdef ARDUINO_TINYPICO
-#define LED_PIN 13 // TinyPICO
+#define LED_PIN 18 // TinyPICO
 #else
 #define LED_PIN 18 // PICO Kit
 #endif
+
+const int led1Pin =  18;
+const int led2Pin =  26;
+int led1State = LOW;
+int led2State = LOW;
 
 #include "esp_task_wdt.h"
 // define two tasks for Blink & loopCounting
@@ -38,6 +43,9 @@ void setup() {
   Serial.begin(115200);   // initialize serial communication at 115200 bits per second:
   setupSSD1306();
   delay(200);
+  pinMode(led2Pin, OUTPUT);
+  digitalWrite(led2Pin, HIGH);   // turn the LED on (HIGH is the voltage level)
+
   checkReset();
   Serial.print("setup() is running on core ");
   Serial.println(xPortGetCoreID());
@@ -97,8 +105,16 @@ void loop()
   lCntL++;
   if ( millis() - myTimeL > 1000 ) {
     myTimeL += 1000;
-    Serial.println(" LOOP ... Hello World...");
+#if 0
+    Serial.print(" LOOP ... Hello World...");
     runSSD1306(); // never returns
+#else
+    led2State++;
+    if ( led2State % 2 )
+      digitalWrite(led2Pin, HIGH);   // turn the LED on (HIGH is the voltage level)
+    else
+      digitalWrite(led2Pin, LOW);    // turn the LED off by making the voltage LOW
+#endif
   }
 }
 

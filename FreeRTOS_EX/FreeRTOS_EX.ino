@@ -29,6 +29,7 @@ void setup() {
 #else
   Serial.println("LittlePICO!");
 #endif
+  checkReset();
 
 #ifdef BOARD_HAS_PSRAM
   delay(100);
@@ -124,40 +125,4 @@ void TaskAnalogReadA3(void *pvParameters)  // This is a task.
     }
     vTaskDelay(10);  // one tick delay (15ms) in between reads for stability
   }
-}
-
-void logMemory() {
-#ifdef BOARD_HAS_PSRAM
-  uint32_t allocSize = ESP.getFreePsram() - 16;
-  Serial.printf( "%d Bytes PSRAM to test ps_malloc()\n", allocSize );
-  uint32_t* psdRamBuffer = (uint32_t*)ps_malloc( allocSize );
-  testMemory( psdRamBuffer, allocSize / sizeof(uint32_t ) );
-  free(psdRamBuffer);
-#elif BOARD_HAS_PSRAM2
-  Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
-  uint32_t allocSize = ESP.getFreePsram() - 32;
-  Serial.printf( "%d Bytes PSRAM to test ps_malloc()\n", allocSize );
-  uint32_t* psdRamBuffer = (uint32_t*)ps_malloc( allocSize );
-  Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
-  testMemory( psdRamBuffer, allocSize / sizeof(uint32_t ) );
-  free(psdRamBuffer);
-  Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
-#endif
-}
-void testMemory( uint32_t* psdRamBuffer, uint32_t testSize ) {
-#ifdef BOARD_HAS_PSRAM
-  for ( uint32_t ii = 0; ii < testSize; ii += 1 ) {
-    psdRamBuffer[ii] = ii;
-  }
-  int jj = 0;
-  for ( uint32_t ii = 0; ii < testSize; ii += 1 ) {
-    if ( psdRamBuffer[ii] != ii ) jj++;
-  }
-  if ( 0 == jj ) {
-    Serial.printf( "All Good! testSize DWORDS=%u\n", testSize );
-  }
-  else {
-    Serial.printf( "%d Fails to compare! (test)\n", jj );
-  }
-#endif
 }
