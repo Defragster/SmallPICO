@@ -31,8 +31,11 @@ void setup()
   Serial.println( ssid );
   uint64_t macAddress = ESP.getEfuseMac();
   uint64_t macAddressTrunc = macAddress << 40;
-  uint64_t chipID = macAddressTrunc >> 40;
-  Serial.printf( "ESP MAC:0x%lx\n", chipid );
+  uint64_t chipID = 0;
+  for (int ii = 0; ii < 17; ii = ii + 8) { // EfuseMac uses little endian architecture (LSB comes first)
+    chipID |= ((ESP.getEfuseMac() >> (40 - ii)) & 0xff) << ii;
+  }
+  Serial.printf("ESP32 MAC:%08X\n", chipID);
 
 #ifdef BOARD_HAS_PSRAM
   Serial.println("BOARD_HAS_PSRAM");
