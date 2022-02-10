@@ -11,6 +11,7 @@
 
    This example code is in the public domain.
 */
+#include "LittlePICO.h"
 
 #define LED_PICO 18
 
@@ -22,20 +23,7 @@ void setup()
   delay(1000);
   digitalWrite(LED_PICO, LOW);   // turn the LED on (HIGH is the voltage level)
   Serial.println("\n" __FILE__ " " __DATE__ " " __TIME__);
-
-  Serial.printf("ESP32 Chip model = %s Rev %d\n", ESP.getChipModel(), ESP.getChipRevision());
-  Serial.printf("This chip has %d cores\n", ESP.getChipCores());  uint64_t chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).
-  uint16_t chip = (uint16_t)(chipid >> 32);
-  char ssid[23];
-  snprintf(ssid, 23, "ESP_ID:%04X%08X", chip, (uint32_t)chipid);
-  Serial.println( ssid );
-  uint64_t macAddress = ESP.getEfuseMac();
-  uint64_t macAddressTrunc = macAddress << 40;
-  uint64_t chipID = 0;
-  for (int ii = 0; ii < 17; ii = ii + 8) { // EfuseMac uses little endian architecture (LSB comes first)
-    chipID |= ((ESP.getEfuseMac() >> (40 - ii)) & 0xff) << ii;
-  }
-  Serial.printf("ESP32 MAC:%08X\n", chipID);
+  boardInfo();
 
 #ifdef BOARD_HAS_PSRAM
   Serial.println("BOARD_HAS_PSRAM");
@@ -46,13 +34,36 @@ void setup()
   delay(100);
   logMemory();
 #endif
+  uint32_t cycTime;
+  Serial.printf("\tCycle count before delay(100): %u\n", cycTime = ESP.getCycleCount() );
+  delay(100);
+  cycTime = ESP.getCycleCount() - cycTime;
+  Serial.printf("\tCycle count DIFF delay(100): %u\n", cycTime );
+    Serial.printf("\tCycle count before delay(100): %u\n", cycTime = ESP.getCycleCount() );
+  uint32_t jj;
+  int ii;
+  cycTime = ESP.getCycleCount();
+  for ( ii=0; ii<1000; ii++ ) {
+    jj += ESP.getCycleCount();
+  }
+  cycTime = ESP.getCycleCount() - cycTime;
+  Serial.printf("\tCycle count for %d calls : %u [noise %u]\n",ii , cycTime, jj );
+  cycTime = ESP.getCycleCount();
+  for ( ii=0; ii<1000; ii++ ) {
+    jj = ESP.getCycleCount();
+  }
+  cycTime = ESP.getCycleCount() - cycTime;
+  Serial.printf("\tCycle count for %d calls : %u [noise %u]\n",ii , cycTime, jj );
 }
 
 uint32_t myTime = millis();
 uint32_t lCnt = 0;
+//void IRAM_ATTR loop() // code in RAM
 void loop()
 {
   static uint32_t ledState = 0;
+  static uint32_t cycTime = 0;
+  static uint32_t cycTimeInDiff = 23982909;
 
   /*
     if ( !(lCnt % 100) )
@@ -69,14 +80,22 @@ void loop()
     else
       digitalWrite(18, LOW);    // turn the LED off by making the voltage LOW
   */
-  if ( 0 && Serial.available() ) {
+  //  if ( Serial.available() ) { // Cuts cycle count in half: Loops/sec=71747
+  if ( ( (ESP.getCycleCount() - cycTime) + cycTimeInDiff >= 239990000 ) ) { // faster : Loops/sec=136984
     while ( Serial.available() ) {
       Serial.print( (char)Serial.read() );
-      delay(1);
+      //delay(1);
     }
+    cycTimeInDiff -= 2398290;
   }
-  if ( (millis() - myTime) > 1000 ) {
+  //if ( (millis() - myTime) > 1000 ) { // Cycle count 1 sec?: 239983710 Loops/sec=122490
+  if ( (ESP.getCycleCount() - cycTime) >= 239990000 ) { // Loops/sec=137999 @240000000
+    // @239990000: Cycle count 1 sec?: 239990555 Loops/sec=137993
+    cycTime = ESP.getCycleCount() - cycTime;
+    Serial.printf("Cycle count 1 sec?: %u\t", cycTime );
     Serial.printf( "Loops/sec=%d\n", lCnt );
+    cycTime = ESP.getCycleCount();
+    cycTimeInDiff = 23982909;
     //Serial.println("\n ... Hello World...\n");
     myTime += 1000;
     lCnt = 0;
