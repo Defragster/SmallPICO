@@ -89,11 +89,12 @@ void loop()
     cycTimeInDiff -= 2398290;
   }
   //if ( (millis() - myTime) > 1000 ) { // Cycle count 1 sec?: 239983710 Loops/sec=122490
-  if ( (ESP.getCycleCount() - cycTime) >= 239990000 ) { // Loops/sec=137999 @240000000
+  if ( (ESP.getCycleCount() - cycTime) >= 239984000 ) { // Loops/sec=137999 @240000000
     // @239990000: Cycle count 1 sec?: 239990555 Loops/sec=137993
     cycTime = ESP.getCycleCount() - cycTime;
     Serial.printf("Cycle count 1 sec?: %u\t", cycTime );
-    Serial.printf( "Loops/sec=%d\n", lCnt );
+    Serial.printf( "Loops/sec=%d\t", lCnt );
+    Serial.printf( "ms=%d\n", millis() );
     cycTime = ESP.getCycleCount();
     cycTimeInDiff = 23982909;
     //Serial.println("\n ... Hello World...\n");
