@@ -92,9 +92,11 @@ void loop()
   if ( (ESP.getCycleCount() - cycTime) >= 239984000 ) { // Loops/sec=137999 @240000000
     // @239990000: Cycle count 1 sec?: 239990555 Loops/sec=137993
     cycTime = ESP.getCycleCount() - cycTime;
-    Serial.printf("Cycle count 1 sec?: %u\t", cycTime );
+    Serial.printf("Loop()s/~sec: %u\t", cycTime );
     Serial.printf( "Loops/sec=%d\t", lCnt );
-    Serial.printf( "ms=%d\n", millis() );
+  // Convert raw temperature in F to Celsius degrees
+  //Serial.print((temprature_sens_read() - 32) / 1.8);
+    Serial.printf( "ms=%d\tTemp °C=%f\n", millis(), ((temprature_sens_read() - 32) / 1.8) );
     cycTime = ESP.getCycleCount();
     cycTimeInDiff = 23982909;
     //Serial.println("\n ... Hello World...\n");
