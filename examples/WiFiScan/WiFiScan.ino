@@ -19,7 +19,7 @@ void setup()
 #ifdef ARDUINO_TINYPICO
   Serial.println("TinyPICO!");
 #else
-  Serial.println("LittlePICO!");
+  Serial.println("SmallPICO!");
 #endif
   Serial.println("Setup done");
 }
@@ -34,7 +34,7 @@ void loop()
 #ifdef ARDUINO_TINYPICO
   Serial.print("TinyPICO! :");
 #else
-  Serial.print("LittlePICO! :");
+  Serial.println("SmallPICO!");
 #endif
   Serial.println("scan done");
   if (n == 0) {
