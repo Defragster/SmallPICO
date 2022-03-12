@@ -28,6 +28,19 @@ void setup() {
   for (int i = 0; i < 10000; i++) {
     bigArray[i] = random(1, 10);
   }
+#ifdef BOARD_HAS_PSRAM
+  Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
+  bigArrayPR = (int*)ps_malloc( sizeof(int) * 10000 );
+  resultArrayPR = (int*)ps_malloc( sizeof(int) * 10000 );
+  if ( 0 == resultArrayPR || 0 == bigArrayPR ) {
+    Serial.printf("FAIL NULL POINTER :: %p %p\n", bigArrayPR, resultArrayPR );
+    return;
+  }
+  Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
+  for (int i = 0; i < 10000; i++) {
+    bigArrayPR[i] = bigArray[i];
+  }
+#endif
 
   for (int i = 0; i < nArraySize; i++) {
 
@@ -39,6 +52,8 @@ void setup() {
 
     argsStruct twoTasks1 = { 0 , 1000 / 2 , n[i] };
     argsStruct twoTasks2 = { 1000 / 2 , 1000 , n[i] };
+    argsStruct twoTasks1PR = { 0 , 1000 / 2 , n[i] };
+    argsStruct twoTasks2PR = { 1000 / 2 , 1000 , n[i] };
 
     argsStruct fourTasks1 = { 0 , 1000 / 4 , n[i] };
     argsStruct fourTasks2 = { 1000 / 4 , 1000 / 4 * 2,   n[i]};
@@ -106,20 +121,7 @@ void setup() {
     Serial.print("end: ");
     Serial.println(end);
 
-
-
-
 #ifdef BOARD_HAS_PSRAM
-    Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
-    //int *bigArrayPR=0, *resultArrayPR=0;
-    bigArrayPR = (int*)ps_malloc( sizeof(int) * 10000 );
-    resultArrayPR = (int*)ps_malloc( sizeof(int) * 10000 );
-    if ( 0 == resultArrayPR || 0 == bigArrayPR ) {
-      Serial.printf("FAIL NULL POINTER :: %p %p\n", bigArrayPR, resultArrayPR );
-      return;
-    }
-    Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
-
     Serial.println("");
     Serial.println("------Two tasks WITH PSRAM -------");
 
@@ -129,7 +131,7 @@ void setup() {
       powerTaskPR,                /* Function to implement the task */
       "powerTaskPR",              /* Name of the task */
       10000,                    /* Stack size in words */
-      (void*)&twoTasks1,        /* Task input parameter */
+      (void*)&twoTasks1PR,        /* Task input parameter */
       20,                       /* Priority of the task */
       NULL,                     /* Task handle. */
       0);                       /* Core where the task should run */
@@ -138,7 +140,7 @@ void setup() {
       powerTaskPR,               /* Function to implement the task */
       "coreTaskPR",              /* Name of the task */
       10000,                   /* Stack size in words */
-      (void*)&twoTasks2,       /* Task input parameter */
+      (void*)&twoTasks2PR,       /* Task input parameter */
       20,                      /* Priority of the task */
       NULL,                    /* Task handle. */
       1);                      /* Core where the task should run */
@@ -155,13 +157,7 @@ void setup() {
     Serial.println(start);
     Serial.print("end: ");
     Serial.println(end);
-
-
-
 #endif
-
-
-
 
     Serial.println("");
     Serial.println("------Four tasks-------");
@@ -223,7 +219,10 @@ void setup() {
     Serial.print("Speedup two tasks: ");
     Serial.println((float) execTimeOneTask / execTimeTwoTask, 4 );
 
-    Serial.print("Speedup two tasks PSRAM: ");
+    Serial.print("\tSpeedup two tasks with PSRAM versus ONE without: ");
+    Serial.println((float) execTimeOneTask / execTimeTwoTaskPR, 4 );
+
+    Serial.print("\tSpeedup two tasks WITH PSRAM and TWO WITHOUT: ");
     Serial.println((float) execTimeTwoTaskPR / execTimeTwoTask, 4 );
 
     Serial.print("Speedup four tasks: ");
