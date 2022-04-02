@@ -74,6 +74,7 @@ void loop()
   if ( Serial.available() ) {
     while ( Serial.available() ) {
       Serial.read();
+      delay(500);
       doBright += 15;
       if ( doBright > 127 )
         doBright = 3;

@@ -1,6 +1,9 @@
 
+#define TenK 10000
+#define MAX_K 1000
+
 // https://techtutorialsx.com/2017/05/16/esp32-dual-core-execution-speedup/
-int n[10] = {2, 3, 4, 5, 10, 50, 100, 1000, 2000, 10000  };
+int n[10] = {2, 3, 4, 5, 10, 50, 100, 1000, 2000, TenK  };
 int nArraySize = 10;
 
 struct argsStruct {
@@ -15,7 +18,7 @@ unsigned long execTimeOneTask, execTimeTwoTask, execTimeTwoTaskPR, execTimeFourT
 
 SemaphoreHandle_t barrierSemaphore = xSemaphoreCreateCounting( 4, 0 );
 
-int bigArray[10000], resultArray[10000];
+int bigArray[TenK], resultArray[TenK];
 int *bigArrayPR = 0, *resultArrayPR = 0;
 
 void setup() {
@@ -25,20 +28,21 @@ void setup() {
 
   randomSeed(analogRead(0));
 
-  for (int i = 0; i < 10000; i++) {
+  for (int i = 0; i < TenK; i++) {
     bigArray[i] = random(1, 10);
   }
 #ifdef BOARD_HAS_PSRAM
   Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
-  bigArrayPR = (int*)ps_malloc( sizeof(int) * 10000 );
-  resultArrayPR = (int*)ps_malloc( sizeof(int) * 10000 );
+  bigArrayPR = (int*)ps_malloc( sizeof(int) * TenK );
+  resultArrayPR = (int*)ps_malloc( sizeof(int) * TenK );
   if ( 0 == resultArrayPR || 0 == bigArrayPR ) {
     Serial.printf("FAIL NULL POINTER :: %p %p\n", bigArrayPR, resultArrayPR );
     return;
   }
   Serial.printf("Used PSRAM: %d\n", ESP.getPsramSize() - ESP.getFreePsram());
-  for (int i = 0; i < 10000; i++) {
+  for (int i = 0; i < TenK; i++) {
     bigArrayPR[i] = bigArray[i];
+    resultArrayPR[i] = resultArray[i];
   }
 #endif
 
@@ -48,17 +52,17 @@ void setup() {
     Serial.print("Starting test for n= ");
     Serial.println(n[i]);
 
-    argsStruct oneTask = { 0 , 1000 , n[i] };
+    argsStruct oneTask = { 0 , MAX_K , n[i] };
 
-    argsStruct twoTasks1 = { 0 , 1000 / 2 , n[i] };
-    argsStruct twoTasks2 = { 1000 / 2 , 1000 , n[i] };
-    argsStruct twoTasks1PR = { 0 , 1000 / 2 , n[i] };
-    argsStruct twoTasks2PR = { 1000 / 2 , 1000 , n[i] };
+    argsStruct twoTasks1 = { 0 , MAX_K / 2 , n[i] };
+    argsStruct twoTasks2 = { MAX_K / 2 , MAX_K , n[i] };
+    argsStruct twoTasks1PR = { 0 , MAX_K / 2 , n[i] };
+    argsStruct twoTasks2PR = { MAX_K / 2 , MAX_K , n[i] };
 
-    argsStruct fourTasks1 = { 0 , 1000 / 4 , n[i] };
-    argsStruct fourTasks2 = { 1000 / 4 , 1000 / 4 * 2,   n[i]};
-    argsStruct fourTasks3 = { 1000 / 4 * 2, 1000 / 4 * 3, n[i]};
-    argsStruct fourTasks4 = { 1000 / 4 * 3 , 1000,     n[i]};
+    argsStruct fourTasks1 = { 0 , MAX_K / 4 , n[i] };
+    argsStruct fourTasks2 = { MAX_K / 4 , MAX_K / 4 * 2,   n[i]};
+    argsStruct fourTasks3 = { MAX_K / 4 * 2, MAX_K / 4 * 3, n[i]};
+    argsStruct fourTasks4 = { MAX_K / 4 * 3 , MAX_K,     n[i]};
 
     Serial.println("");
     Serial.println("------One task-------");
@@ -68,7 +72,7 @@ void setup() {
     xTaskCreatePinnedToCore(
       powerTask,               /* Function to implement the task */
       "powerTask",              /* Name of the task */
-      10000,                   /* Stack size in words */
+      TenK,                   /* Stack size in words */
       (void*)&oneTask,         /* Task input parameter */
       20,                      /* Priority of the task */
       NULL,                    /* Task handle. */
@@ -79,10 +83,10 @@ void setup() {
     end = micros();
     execTimeOneTask = end - start;
     Serial.print("Exec time: ");
-    Serial.println(execTimeOneTask);
-    Serial.print("Start: ");
-    Serial.println(start);
-    Serial.print("end: ");
+    Serial.print(execTimeOneTask);
+    Serial.print("\tStart: ");
+    Serial.print(start);
+    Serial.print("\tend: ");
     Serial.println(end);
 
     Serial.println("");
@@ -93,7 +97,7 @@ void setup() {
     xTaskCreatePinnedToCore(
       powerTask,                /* Function to implement the task */
       "powerTask",              /* Name of the task */
-      10000,                    /* Stack size in words */
+      TenK,                    /* Stack size in words */
       (void*)&twoTasks1,        /* Task input parameter */
       20,                       /* Priority of the task */
       NULL,                     /* Task handle. */
@@ -102,7 +106,7 @@ void setup() {
     xTaskCreatePinnedToCore(
       powerTask,               /* Function to implement the task */
       "coreTask",              /* Name of the task */
-      10000,                   /* Stack size in words */
+      TenK,                   /* Stack size in words */
       (void*)&twoTasks2,       /* Task input parameter */
       20,                      /* Priority of the task */
       NULL,                    /* Task handle. */
@@ -115,22 +119,19 @@ void setup() {
     end = micros();
     execTimeTwoTask = end - start;
     Serial.print("Exec time: ");
-    Serial.println(execTimeTwoTask);
-    Serial.print("Start: ");
-    Serial.println(start);
-    Serial.print("end: ");
+    Serial.print(execTimeTwoTask);
+    Serial.print("\tStart: ");
+    Serial.print(start);
+    Serial.print("\tend: ");
     Serial.println(end);
 
 #ifdef BOARD_HAS_PSRAM
-    Serial.println("");
-    Serial.println("------Two tasks WITH PSRAM -------");
-
+    Serial.println("\n------Two tasks WITH PSRAM -------");
     start = micros();
-
     xTaskCreatePinnedToCore(
       powerTaskPR,                /* Function to implement the task */
       "powerTaskPR",              /* Name of the task */
-      10000,                    /* Stack size in words */
+      TenK,                    /* Stack size in words */
       (void*)&twoTasks1PR,        /* Task input parameter */
       20,                       /* Priority of the task */
       NULL,                     /* Task handle. */
@@ -139,7 +140,7 @@ void setup() {
     xTaskCreatePinnedToCore(
       powerTaskPR,               /* Function to implement the task */
       "coreTaskPR",              /* Name of the task */
-      10000,                   /* Stack size in words */
+      TenK,                   /* Stack size in words */
       (void*)&twoTasks2PR,       /* Task input parameter */
       20,                      /* Priority of the task */
       NULL,                    /* Task handle. */
@@ -152,22 +153,31 @@ void setup() {
     end = micros();
     execTimeTwoTaskPR = end - start;
     Serial.print("PSRAM Exec time: ");
-    Serial.println(execTimeTwoTaskPR);
-    Serial.print("Start: ");
-    Serial.println(start);
-    Serial.print("end: ");
+    Serial.print(execTimeTwoTaskPR);
+    Serial.print("\tStart: ");
+    Serial.print(start);
+    Serial.print("\tend: ");
     Serial.println(end);
+
+    Serial.printf("PSRAM Result Array Testing\n");
+    int jj = 0;
+    for (int i = 0; i < TenK; i++) {
+      if ( resultArrayPR[i] != resultArray[i] ) jj++;
+    }
+    if ( 0 != jj )
+      Serial.printf("PSRAM Result Array Testing where %d Failed\n", jj);
+    else
+      Serial.printf("PSRAM Result Array Testing - All Passed!\n");
 #endif
-
     Serial.println("");
-    Serial.println("------Four tasks-------");
 
+    Serial.println("------Four tasks-------");
     start = micros();
 
     xTaskCreatePinnedToCore(
       powerTask,                /* Function to implement the task */
       "powerTask",              /* Name of the task */
-      10000,                    /* Stack size in words */
+      TenK,                    /* Stack size in words */
       (void*)&fourTasks1,       /* Task input parameter */
       20,                       /* Priority of the task */
       NULL,                     /* Task handle. */
@@ -176,7 +186,7 @@ void setup() {
     xTaskCreatePinnedToCore(
       powerTask,                /* Function to implement the task */
       "powerTask",              /* Name of the task */
-      10000,                    /* Stack size in words */
+      TenK,                    /* Stack size in words */
       (void*)&fourTasks2,       /* Task input parameter */
       20,                       /* Priority of the task */
       NULL,                     /* Task handle. */
@@ -185,7 +195,7 @@ void setup() {
     xTaskCreatePinnedToCore(
       powerTask,                /* Function to implement the task */
       "powerTask",              /* Name of the task */
-      10000,                    /* Stack size in words */
+      TenK,                    /* Stack size in words */
       (void*)&fourTasks3,       /* Task input parameter */
       20,                       /* Priority of the task */
       NULL,                     /* Task handle. */
@@ -194,7 +204,7 @@ void setup() {
     xTaskCreatePinnedToCore(
       powerTask,                /* Function to implement the task */
       "powerTask",              /* Name of the task */
-      10000,                    /* Stack size in words */
+      TenK,                    /* Stack size in words */
       (void*)&fourTasks4,       /* Task input parameter */
       20,                       /* Priority of the task */
       NULL,                     /* Task handle. */
@@ -207,10 +217,10 @@ void setup() {
     end = micros();
     execTimeFourTask = end - start;
     Serial.print("Exec time: ");
-    Serial.println(execTimeFourTask);
-    Serial.print("Start: ");
-    Serial.println(start);
-    Serial.print("end: ");
+    Serial.print(execTimeFourTask);
+    Serial.print("\tStart: ");
+    Serial.print(start);
+    Serial.print("\tend: ");
     Serial.println(end);
 
     Serial.println();
