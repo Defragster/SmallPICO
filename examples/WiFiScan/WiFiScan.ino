@@ -18,6 +18,8 @@ void setup()
   Serial.println("\n" __FILE__ " " __DATE__ " " __TIME__);
 #ifdef ARDUINO_TINYPICO
   Serial.println("TinyPICO!");
+#elifdef ARDUINO_ESP32S2_DEV
+  Serial.println("SmallPICOS2!");
 #else
   Serial.println("SmallPICO!");
 #endif
@@ -33,6 +35,8 @@ void loop()
   int n = WiFi.scanNetworks();
 #ifdef ARDUINO_TINYPICO
   Serial.print("TinyPICO! :");
+#elifdef ARDUINO_ESP32S2_DEV
+  Serial.println("SmallPICOS2!");
 #else
   Serial.println("SmallPICO!");
 #endif

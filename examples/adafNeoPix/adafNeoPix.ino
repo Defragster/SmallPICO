@@ -32,6 +32,7 @@ void setup()
 {
   Serial.begin(115200);
   testOrderRGB( false );
+  pinMode( 4, INPUT_PULLUP);
 }
 
 void testOrderRGB( bool bWait ) {

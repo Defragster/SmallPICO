@@ -11,14 +11,21 @@
 
    This example code is in the public domain.
 */
-#include "LittlePICO.h"
+#ifdef ARDUINO_ESP32S2_DEV
+#define LED_PICO 36
+#define PIN 21 // 2203A
+// #define PIN 18 // DEVKITM-1
+int led[] = { 9, 8, 0, 6, 7, 14, 17, 18, 44, 43, 33, 37, 38, 36, 35, 4, 5 }; // 2203 :: S2
+#else
 #define LED_PICO 18
-#include <Adafruit_NeoPixel.h>
 #define PIN 9
+int led[] = { 5, 14, 23, 18, 12, 19, 4, 13, 25, 15, 26, 27, 33, 32, 21, 22 }; // 2201&2202 :: PICO D4
+#endif
+#include "LittlePICO.h"
+#include <Adafruit_NeoPixel.h>
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
-int lColors[8] = { 0, 3618615, 3604480, 14080, 55, 3618560, 14135, 3604535 };
+int lColors[8] = { 0x0, 0x373737, 0x370000, 0x3700, 0x37, 0x373700, 0x3737, 0x370037 };
 int lBlink = 0;
-int led[] = { 5, 14, 23, 18, 12, 19, 4, 13, 25, 15, 26, 27, 33, 32, 21, 22 }; // 2201
 
 void setup()
 {
@@ -120,10 +127,10 @@ void loop()
     // @239990000: Cycle count 1 sec?: 239990555 Loops/sec=137993
     cycTime = ESP.getCycleCount() - cycTime;
     Serial.printf("Loop()s/~sec: %u\t", cycTime );
-    Serial.printf( "Loops/sec=%d\t", lCnt );
+    Serial.printf( "Loops/sec=%d\t%u\n", lCnt, millis() );
     // Convert raw temperature in F to Celsius degrees
     //Serial.print((temprature_sens_read() - 32) / 1.8);
-    Serial.printf( "ms=%d\tTemp °C=%f\n", millis(), ((temprature_sens_read() - 32) / 1.8) );
+    //Serial.printf( "ms=%d\tTemp °C=%f\n", millis(), ((temprature_sens_read() - 32) / 1.8) );
     cycTime = ESP.getCycleCount();
     cycTimeInDiff = 23982909;
     //Serial.println("\n ... Hello World...\n");
@@ -137,9 +144,10 @@ void loop()
   }
 }
 
-void ledToggle() {
-  pixels.setPixelColor(0, lColors[lBlink]);
+void ledToggle() { // assumes 8 color array
+  pixels.setPixelColor(0, lColors[lBlink] );
   pixels.show(); // This sends the updated pixel color to the hardware.
   lBlink++;
-  if ( lBlink > 6 ) lBlink = 0;
+  if ( lBlink > 7 )
+    lBlink = 0;
 }
