@@ -14,7 +14,7 @@
 #ifdef ARDUINO_ESP32S2_DEV
 #define LED_PICO 36
 #define PIN 21 // 2203A
-// #define PIN 18 // DEVKITM-1
+//#define PIN 18 // DEVKITM-1
 int led[] = { 9, 8, 0, 6, 7, 14, 17, 18, 44, 43, 33, 37, 38, 36, 35, 4, 5 }; // 2203 :: S2
 #else
 #define LED_PICO 18
