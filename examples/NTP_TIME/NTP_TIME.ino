@@ -3,8 +3,8 @@
 
 // https://lastminuteengineers.com/esp32-ntp-server-date-time-tutorial/
 
-const char* ssid       = "netEagle_GuestNG";
-const char* password   = "20222022";
+const char* ssid       = "SSID";
+const char* password   = "password";
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -28800;
