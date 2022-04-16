@@ -8,3 +8,9 @@ But adds PSRAM: To add PSRAM enable, use boards.local.txt in the hardware\esp32\
 Otherwise just a pile of test of function sketches. Compared to very similar TinyPICO with PSRAM.
 
 NOTE: Using ESP32 board version 2.0.2 with IDE 1.8.19 at this time
+For S2 testing Updated to: esp32\hardware\esp32\2.0.3-RC1
+
+
+Some online examples use this for OLED SSD1306:
+https://github.com/ThingPulse/esp8266-oled-ssd1306
+

@@ -555,7 +555,6 @@ void testscrolltext(void) {
 
   // Scroll in various directions, pausing in-between:
   display.startscrollright(0x00, 0x0F);
-  delay(200);
   display.stopscroll();
   delay(100);
   display.startscrollleft(0x00, 0x0F);
