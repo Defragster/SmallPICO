@@ -1,6 +1,10 @@
 #include <Adafruit_NeoPixel.h>
 
+#ifdef ARDUINO_ESP32S2_DEV
+#define PIN 18
+#else
 #define PIN 9
+#endif
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
