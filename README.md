@@ -14,3 +14,5 @@ For S2 testing Updated to: esp32\hardware\esp32\2.0.3-RC1
 Some online examples use this for OLED SSD1306:
 https://github.com/ThingPulse/esp8266-oled-ssd1306
 
+This one for FlappyBird uses that livrary: https://www.youtube.com/watch?v=BzjRDpANjaQ
+will make it to the examples directory

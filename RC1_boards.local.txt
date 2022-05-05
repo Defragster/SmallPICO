@@ -1,0 +1,6 @@
+pico32.menu.PSRAM.enabled=Enabled
+pico32.menu.PSRAM.enabled.build.defines=-DBOARD_HAS_PSRAM -mfix-esp32-psram-cache-issue -mfix-esp32-psram-cache-strategy=memw
+pico32.menu.PSRAM.enabled.build.extra_libs=
+pico32.menu.PSRAM.disabled=Disabled
+pico32.menu.PSRAM.disabled.build.defines=
+pico32.menu.PSRAM.disabled.build.extra_libs=
