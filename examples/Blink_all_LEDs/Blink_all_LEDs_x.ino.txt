@@ -1,0 +1,63 @@
+/*
+  Blink
+  Turns on an LED on and off one at a time.
+  This example code is in the public domain.
+ */
+ 
+int i;
+int led[]={5,14,23,18,12,19,4,13,25,15,26,27,33,32,21,22};
+   
+// the setup routine runs once when you press reset:
+void setup() {                
+// initialize the digital pin as an output.
+
+pinMode(4, OUTPUT); 
+pinMode(5, OUTPUT); 
+//pinMode(6, OUTPUT); 
+//pinMode(7, OUTPUT); 
+//pinMode(8, OUTPUT); 
+//pinMode(9, OUTPUT); 
+//pinMode(10, OUTPUT); 
+//pinMode(11, OUTPUT); 
+pinMode(12, OUTPUT); 
+pinMode(13, OUTPUT);
+pinMode(14, OUTPUT); 
+pinMode(15, OUTPUT); 
+//pinMode(16, OUTPUT); 
+//pinMode(17, OUTPUT); 
+pinMode(18, OUTPUT);  
+pinMode(19, OUTPUT);  
+//pinMode(20, OUTPUT);
+pinMode(21, OUTPUT); 
+pinMode(22, OUTPUT);  
+pinMode(23, OUTPUT); 
+//pinMode(24, OUTPUT);  
+pinMode(25, OUTPUT); 
+pinMode(26, OUTPUT); 
+pinMode(27, OUTPUT); 
+
+//pinMode(28, OUTPUT); 
+//pinMode(29, OUTPUT); 
+//pinMode(30, OUTPUT); 
+//pinMode(31, OUTPUT); 
+pinMode(32, OUTPUT);
+pinMode(33, OUTPUT);
+
+for (i = 0; i<16; i++) {
+  digitalWrite(led[i], LOW);    // turn the LED off by making the voltage LOW
+//  delay(100);
+}
+}
+
+void loop(){
+// the loop routine runs over and over again forever
+
+for (i = 0; i<16; i++) {
+  digitalWrite(led[i], HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(100);                   // wait for a 1/10 second
+  digitalWrite(led[i], LOW);    // turn the LED off by making the voltage LOW
+  delay(100);
+}
+
+}
+  
